@@ -1,13 +1,13 @@
 BOARD = [
-            [3, 0, 0, 2, 0, 1, 0, 0, 0],
-            [7, 4, 0, 0, 0, 0, 0, 1, 9],
-            [0, 2, 0, 0, 6, 0, 5, 0, 0],
-            [0, 3, 0, 7, 4, 0, 0, 0, 1],
-            [0, 0, 8, 0, 0, 0, 9, 0, 0],
-            [6, 0, 0, 0, 9, 2, 0, 5, 0],
-            [0, 0, 2, 0, 8, 0, 0, 4, 0],
-            [1, 5, 0, 0, 0, 0, 0, 9, 7],
-            [0, 0, 0, 9, 0, 3, 0, 0, 2]
+            [8, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 3, 6, 0, 0, 0, 0, 0],
+            [0, 7, 0, 0, 9, 0, 2, 0, 0],
+            [0, 5, 0, 0, 0, 7, 0, 0, 0],
+            [0, 0, 0, 0, 4, 5, 7, 0, 0],
+            [0, 0, 0, 1, 0, 0, 0, 3, 0],
+            [0, 0, 1, 0, 0, 0, 0, 6, 8],
+            [0, 0, 8, 5, 0, 0, 0, 1, 0],
+            [0, 9, 0, 0, 0, 0, 4, 0, 0]
         ]
 
 def printBoard(board):
@@ -51,11 +51,13 @@ def isEmpty(board):
                 return i, j  
     return None
 
-def isValid(cell, board):
+def isValid(number, cell, board):
     """Checks to see if cell in the board is a valid number
 
     Parameters
     ----------
+    number: int
+        The number that will go into the selected cell to see if it's valid
     cell: tuple
         The cell in the board that is being checked
     board : 2-D Array
@@ -68,17 +70,14 @@ def isValid(cell, board):
     """
     crow = cell[0]
     ccol = cell[1]
-    # check row and column
+    
     for i in range(len(board)):
-        if board[crow][ccol] == board[i][ccol]:
-            continue
+        if number == board[i][ccol]:
             return False
     for j in range(len(board[crow])):
-        if board[crow][ccol] == board[crow][j]:
-            continue
+        if number == board[crow][j]:
             return False
-        
-    
+
     # check the 3x3 grid
     row_mod = crow % 3
     col_mod = ccol % 3
@@ -105,20 +104,9 @@ def isValid(cell, board):
     
     for i in range(row_rangel, row_rangeh+1):
         for j in range(col_rangel, col_rangeh+1):
-            if board[crow][ccol] == board[i][j]:
+            if number == board[i][j]:
                 return False
     return True
-
-
-def completedBoard(board):
-    for i in range(len(board)):
-        if len(set(board[i])) != len(board[i]):
-            return False
-        col = []
-        for j in range(len(board[i])):
-            col.append(board[i][j])
-        if len(set(col)) != len(board):
-            return False
     
 
 # Approach to solving Sudoku
@@ -133,7 +121,31 @@ def completedBoard(board):
 ### Backtrack when the number filled is not valid
 
 def solveBoard(board):
+    """Solves the Sudoku Board
+
+    Parameters
+    ----------
+    board : 2-D Array
+        The matrix with the full information of the Sudoku Board
+
+    Returns
+    -------
+    True if the board is solved
+    False otherwise
+    """
     # visit the empty cell
     backtrack_log = []
     empty_cell = isEmpty(board)
-    backtrack_log.append(empty_cell)
+    if empty_cell is None:
+        return True
+    else:
+        row, col = empty_cell
+        for number in range(1, 10):
+            if isValid(number, empty_cell, board):
+                board[row][col] = number
+                
+                if solveBoard(board):
+                    return True
+                
+                board[row][col] = 0
+    return False
